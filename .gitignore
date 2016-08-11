@@ -1,0 +1,12 @@
+.project
+.settings
+salesforce.schema
+Referenced Packages
+*.sublime-project
+*.sublime-settings
+*.sublime-workspace
+apex-scripts/log
+build.properties
+config
+mm.log
+ant-salesforce.jar
