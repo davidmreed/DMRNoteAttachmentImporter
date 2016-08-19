@@ -6,7 +6,7 @@
 private class DMRNoteAttachmentImporterTEST {
     // Test content contains HTML entities, line breaks (of all types), and Unicode.
     private static String content = 'This is some example text. \'"&<>\n\n\rκατέβην χθὲς εἰς Πειραιᾶ μετὰ Γλαύκωνος τοῦ Ἀρίστωνος\r\nπροσευξόμενός τε τῇ θεῷ καὶ ἅμα τὴν ἑορτὴν βουλόμενος\nθεάσασθαι τίνα τρόπον ποιήσουσιν ἅτε νῦν πρῶτον ἄγοντες.\nHwæt, wē Gār-Dena      in gēardagum,\nþēodcyninga      þrym gefrūnon,\nhū ðā æþelingas      ellen fremedon !';
-
+    
     @istest
     private static void testAddingAttachments() {
         Contact linkedContact = new Contact(LastName='Testify');
@@ -70,22 +70,31 @@ private class DMRNoteAttachmentImporterTEST {
     
     @istest
     private static void testErrorHandling() {
-        // To test error handling, we will attempt to import a note and an attachment to a record that supports neither (our own DMRNoteProxy object).
-        // We should get a result of false, errors listed in DMRNoteBulkImporter.results, and zero notes/attachments remaining.
+        // To test error handling, we will attempt to import notes and attachments that fail both for themselves and in their ContentDocumentLinks.
+        // We should get a result of false, errors listed in DMRNoteBulkImporter.results, and only the valid notes/attachments remaining.
         DMRNoteProxy__c n = new DMRNoteProxy__c();
         DMRNoteAttachmentImporter a = new DMRNoteAttachmentImporter();
         
         insert n;
         
-        a.addAttachment('Test Attachment', 'Test.txt', Blob.valueOf(content), n.Id, 'InternalUsers', 'I');
-        a.addNote('Test Note', content, n.Id, 'InternalUsers', 'I');
+        // Fail due to invalid ContentDocumentLinks
+        a.addAttachment('Test Attachment', 'Test.txt', Blob.valueOf(content), n.Id, 'InternalUsers', 'Q');
+        a.addNote('Test Note', content, n.Id, 'InternalUsers', 'Q');
+              
+        // Succeed
+        a.addNote('Successful Note', content, n.Id, 'InternalUsers', 'I');
+        a.addAttachment('Successful Attachment', 'Test.txt', Blob.valueOf(content), n.Id, 'InternalUsers', 'I');
         
         System.assertEquals(false, a.insertRecords());
-        System.assertEquals(a.results.size(), 2);
+        System.assertEquals(a.results.size(), 4);
         System.assertEquals(false, a.results[0].isSuccess());        
         System.assertEquals(false, a.results[1].isSuccess());
-        System.assertEquals(0, [SELECT count() FROM ContentDocumentLink WHERE LinkedEntityId = :n.Id]);        
-        System.assertEquals(0, [SELECT count() FROM ContentNote]);
-        System.assertEquals(0, [SELECT count() FROM ContentVersion]);
+        System.assertEquals(true, a.results[2].isSuccess());
+        System.assertEquals(true, a.results[3].isSuccess());
+        System.assertEquals(2, [SELECT count() FROM ContentDocumentLink WHERE LinkedEntityId = :n.Id]);        
+        System.assertEquals(1, [SELECT count() FROM ContentNote]);
+        // ContentNotes have hidden ContentVersions/ContentDocuments somewhere or other.
+        System.assertEquals(2, [SELECT count() FROM ContentVersion]);
+        System.assertEquals(2, [SELECT count() FROM ContentDocument]);
     }
 }

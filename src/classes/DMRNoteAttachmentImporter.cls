@@ -81,7 +81,7 @@ public class DMRNoteAttachmentImporter {
     // Insert all of the accumulated note and attachment records and their associated links.
     // Return true if all succeeded; false if any errors occured. this.results contains the errors, if any.
     // If the content inserts correctly and the link does not, removes the content.
-    // Limits usage: 0-2 SOQL queries; 2 DML operations (constant)
+    // Limits usage: 0-3 SOQL queries; 2-4 DML operations
     public Boolean insertRecords() {
         List<ContentDocumentLink> linksToInsert = new List<ContentDocumentLink>();
         List<ContentDocumentLink> linksToAttachments = new List<ContentDocumentLink>();
@@ -106,6 +106,7 @@ public class DMRNoteAttachmentImporter {
                     linksToAttachments.add(cdl);
                     attachmentIds.add(objs[i].Id);
                 }
+                
                 linksToInsert.add(cdl);
             } else {
                 retval = false;
@@ -113,11 +114,14 @@ public class DMRNoteAttachmentImporter {
         }
         
         // For the attachments, if any, pull out the ContentDocumentIds to update our links.
+        Set<Id> contentDocumentIds = new Set<Id>();
+                
         if (attachmentIds.size() > 0) {
             Map<Id, ContentVersion> m = new Map<Id, ContentVersion>([SELECT ContentDocumentId FROM ContentVersion WHERE Id IN :attachmentIds]);
         
             for (Integer i = 0; i < linksToAttachments.size(); i++) {
                 linksToAttachments[i].ContentDocumentId = m.get(attachmentIds[i]).ContentDocumentId;
+                contentDocumentIds.add(linksToAttachments[i].ContentDocumentId);
             }
         }
         
@@ -125,21 +129,34 @@ public class DMRNoteAttachmentImporter {
         
         // If any link object failed to insert, remove the corresponding note or attachment and report the error.
         // ContentVersion cannot be deleted directly; query for the associated ContentDocument and remove that.
-        // FIXME: does this work on Notes?
-        List<Id> objsToDelete = new List<Id>();
+        List<Id> attachmentsToDelete = new List<Id>();
+        List<Id> notesToDelete = new List<Id>();
         
         for (Integer i = 0; i < linksSRs.size(); i++) {
             
             if (!linksSRs[i].isSuccess()) {
-                objsToDelete.add(objs[i].Id);
+                if (contentDocumentIds.contains(linksToInsert[i].ContentDocumentId)) {
+                    // This is a link to a ContentDocument
+                    attachmentsToDelete.add(linksToInsert[i].ContentDocumentId);
+                } else {
+                    notesToDelete.add(linksToInsert[i].ContentDocumentId);
+                }
+                
                 // Replace the successful result from the associated note or attachment with this error record.
                 results.set(i, linksSRs[i]);
             }
         }
         
-        if (objsToDelete.size() > 0) {
-            List<ContentDocument> documents = [SELECT Id FROM ContentDocument WHERE Id IN (SELECT ContentDocumentId FROM ContentVersion WHERE Id IN :objsToDelete)];
+        if (attachmentsToDelete.size() > 0) {
+            List<ContentDocument> documents = [SELECT Id FROM ContentDocument WHERE Id IN :attachmentsToDelete];
             delete documents;
+            retval = false;
+        }
+        
+        if (notesToDelete.size() > 0) {
+            List<ContentNote> notes = [SELECT Id FROM ContentNote WHERE Id IN :notesToDelete];
+            
+            delete notes;
             retval = false;
         }
         
