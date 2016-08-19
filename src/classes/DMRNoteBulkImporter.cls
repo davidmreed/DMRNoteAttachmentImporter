@@ -1,6 +1,6 @@
 // DMRNoteBulkImporter.cls
 // (c) 2016 David Reed
-// Available under the terms of the BSD License.
+// Available under the terms of the MIT License.
 
 public class DMRNoteBulkImporter implements Database.Batchable<sObject> {
     private List<Id> noteProxyIDs;

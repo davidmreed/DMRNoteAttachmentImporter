@@ -1,6 +1,6 @@
 // DMRNoteAttachmentImporterTEST.cls
 // (c) 2016 David Reed
-// Available under the terms of the BSD License.
+// Available under the terms of the MIT License.
 
 @istest
 private class DMRNoteAttachmentImporterTEST {
