@@ -10,5 +10,9 @@
         <members>DMRNoteProxy__c</members>
         <name>CustomObject</name>
     </types>
+    <types>
+        <members>DMRNoteImporter</members>
+        <name>PermissionSet</name>
+    </types>
     <version>36.0</version>
 </Package>
