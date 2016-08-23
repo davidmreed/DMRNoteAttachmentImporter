@@ -33,6 +33,7 @@ public class DMRNoteBulkImporter implements Database.Batchable<sObject> {
 
             if (im.results[i].isSuccess()) {
                 proxy.Imported__c = true;
+                proxy.Error__c = '';
                 proxy.Note_ID__c = im.results[i].getId();
             } else {
                 Database.Error err = im.results[i].getErrors()[0];
