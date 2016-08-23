@@ -16,10 +16,6 @@
         <apexClass>DMRNoteBulkImporter</apexClass>
         <enabled>true</enabled>
     </classAccesses>
-    <classAccesses>
-        <apexClass>DMRNoteImporter</apexClass>
-        <enabled>true</enabled>
-    </classAccesses>
     <fieldPermissions>
         <editable>true</editable>
         <field>DMRNoteProxy__c.Content__c</field>
