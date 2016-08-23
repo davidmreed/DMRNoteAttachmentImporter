@@ -47,13 +47,13 @@
     <allowInChatterGroups>false</allowInChatterGroups>
     <compactLayoutAssignment>SYSTEM</compactLayoutAssignment>
     <deploymentStatus>Deployed</deploymentStatus>
-    <description>This object enables bulk import of ContentNote records. Import to this object with content and linking details, then use DMRNoteBulkImporter to convert to note records..</description>
+    <description>This object enables bulk import of ContentNote records. Import to this object with content and linking details, then use the list views or Apex DMRNoteBulkImporter to convert to note records..</description>
     <enableActivities>false</enableActivities>
     <enableBulkApi>true</enableBulkApi>
     <enableFeeds>false</enableFeeds>
     <enableHistory>false</enableHistory>
     <enableReports>false</enableReports>
-    <enableSearch>false</enableSearch>
+    <enableSearch>true</enableSearch>
     <enableSharing>true</enableSharing>
     <enableStreamingApi>true</enableStreamingApi>
     <fields>
@@ -133,13 +133,39 @@
         <type>Text</type>
         <unique>false</unique>
     </fields>
-    <label>DMRNoteProxy</label>
+    <label>Note Proxy</label>
+    <listViews>
+        <fullName>All</fullName>
+        <columns>OBJECT_ID</columns>
+        <columns>Title__c</columns>
+        <columns>Content__c</columns>
+        <columns>Imported__c</columns>
+        <columns>Error__c</columns>
+        <filterScope>Everything</filterScope>
+        <label>All</label>
+    </listViews>
     <nameField>
         <displayFormat>NP-{000000}</displayFormat>
         <label>Name</label>
         <type>AutoNumber</type>
     </nameField>
-    <pluralLabel>DMRNoteProxies</pluralLabel>
-    <searchLayouts/>
+    <pluralLabel>Note Proxies</pluralLabel>
+    <searchLayouts>
+        <excludedStandardButtons>Accept</excludedStandardButtons>
+        <excludedStandardButtons>ChangeOwner</excludedStandardButtons>
+        <listViewButtons>Import</listViewButtons>
+    </searchLayouts>
     <sharingModel>ReadWrite</sharingModel>
+    <webLinks>
+        <fullName>Import</fullName>
+        <availability>online</availability>
+        <displayType>massActionButton</displayType>
+        <height>600</height>
+        <linkType>page</linkType>
+        <masterLabel>Import</masterLabel>
+        <openType>sidebar</openType>
+        <page>DMRImportNotes</page>
+        <protected>false</protected>
+        <requireRowSelection>true</requireRowSelection>
+    </webLinks>
 </CustomObject>

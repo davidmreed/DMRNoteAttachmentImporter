@@ -1,8 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <PermissionSet xmlns="http://soap.sforce.com/2006/04/metadata">
     <classAccesses>
+        <apexClass>DMRImportNotesPageController</apexClass>
+        <enabled>true</enabled>
+    </classAccesses>
+    <classAccesses>
         <apexClass>DMRNoteAttachmentImporter</apexClass>
-        <enabled>false</enabled>
+        <enabled>true</enabled>
     </classAccesses>
     <classAccesses>
         <apexClass>DMRNoteAttachmentImporterTEST</apexClass>
@@ -10,6 +14,10 @@
     </classAccesses>
     <classAccesses>
         <apexClass>DMRNoteBulkImporter</apexClass>
+        <enabled>true</enabled>
+    </classAccesses>
+    <classAccesses>
+        <apexClass>DMRNoteImporter</apexClass>
         <enabled>true</enabled>
     </classAccesses>
     <fieldPermissions>
@@ -62,4 +70,12 @@
         <object>DMRNoteProxy__c</object>
         <viewAllRecords>true</viewAllRecords>
     </objectPermissions>
+    <pageAccesses>
+        <apexPage>DMRImportNotes</apexPage>
+        <enabled>true</enabled>
+    </pageAccesses>
+    <tabSettings>
+        <tab>DMRNoteProxy__c</tab>
+        <visibility>Visible</visibility>
+    </tabSettings>
 </PermissionSet>

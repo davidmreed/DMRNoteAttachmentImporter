@@ -1,0 +1,14 @@
+<apex:page standardController="DMRNoteProxy__c" extensions="DMRImportNotesPageController" recordSetVar="proxies">
+<apex:form >
+<apex:pageBlock title="Import Notes">
+    <p>Preparing to batch-import {!noteCount} {! IF(noteCount > 1, "notes", "note") }. For large notes, you may need to adjust the batch size down.</p>
+    <apex:pageBlockSection >
+        <apex:pageBlockSectionItem >
+            <apex:outputLabel value="Block Size" for="bs" />
+            <apex:inputText id="bs" value="{!batchSize}" required="true" size="4" />
+        </apex:pageBlockSectionItem>
+    </apex:pageBlockSection>
+    <apex:commandButton value="Import" action="{!importNotes}" />
+    </apex:pageBlock>
+</apex:form>
+</apex:page>
