@@ -15,13 +15,11 @@ private class DMRNoteAttachmentImporterTEST {
         insert linkedContact;
 
         for (Integer i = 0; i < 50; i++) {
-            im.addAttachment('Test Attachment', 'Test.txt', Blob.valueOf(content), linkedContact.Id, 'InternalUsers', 'I');
+            im.addAttachment('Test Attachment', 'Test.txt', Blob.valueOf(content), linkedContact.Id, 'AllUsers', 'I');
         }
         
-        System.assertEquals(true, im.insertRecords());
-        
-        System.assertEquals(true, DMRNoteAttachmentImporter.addSingleAttachment('Test Attachment', 'Test.txt', Blob.valueOf(content), linkedContact.Id, 'InternalUsers', 'I'));
-        
+        System.assertEquals(true, im.insertRecords());        
+        System.assertEquals(true, DMRNoteAttachmentImporter.addSingleAttachment('Test Attachment', 'Test.txt', Blob.valueOf(content), linkedContact.Id, 'AllUsers', 'I'));
         System.assertEquals(51, [SELECT count() FROM ContentDocumentLink WHERE LinkedEntityId = :linkedContact.Id]);
     }
     
@@ -33,12 +31,12 @@ private class DMRNoteAttachmentImporterTEST {
         insert linkedContact;
 
         for (Integer i = 0; i < 50; i++) {
-            im.addNote('Test Note', content, linkedContact.Id, 'InternalUsers', 'I');
+            im.addNote('Test Note', content, linkedContact.Id, 'AllUsers', 'I');
         }
 
         System.assertEquals(true, im.insertRecords());
         
-        System.assertEquals(true, DMRNoteAttachmentImporter.addSingleNote('Test Note', content, linkedContact.Id, 'InternalUsers', 'I'));
+        System.assertEquals(true, DMRNoteAttachmentImporter.addSingleNote('Test Note', content, linkedContact.Id, 'AllUsers', 'I'));
 
         // We are going to check that all notes/attachments inserted correctly.
         // We are not going to verify that the note text is exactly equal to
@@ -54,7 +52,7 @@ private class DMRNoteAttachmentImporterTEST {
         insert linkedContact;
 
         for (Integer i = 0; i < 200; i++) {
-            proxies.add(new DMRNoteProxy__c(Title__c = 'Test', Content__c = content, LinkedTo__c = linkedContact.Id, Visibility__c = 'InternalUsers', ShareType__c = 'I', Imported__c = False));
+            proxies.add(new DMRNoteProxy__c(Title__c = 'Test', Content__c = content, LinkedTo__c = linkedContact.Id, Visibility__c = 'AllUsers', ShareType__c = 'I', Imported__c = False));
         }
 
         insert proxies;
@@ -78,12 +76,12 @@ private class DMRNoteAttachmentImporterTEST {
         insert n;
         
         // Fail due to invalid ContentDocumentLinks
-        a.addAttachment('Test Attachment', 'Test.txt', Blob.valueOf(content), n.Id, 'InternalUsers', 'Q');
-        a.addNote('Test Note', content, n.Id, 'InternalUsers', 'Q');
+        a.addAttachment('Test Attachment', 'Test.txt', Blob.valueOf(content), n.Id, 'AllUsers', 'Q');
+        a.addNote('Test Note', content, n.Id, 'AllUsers', 'Q');
               
         // Succeed
-        a.addNote('Successful Note', content, n.Id, 'InternalUsers', 'I');
-        a.addAttachment('Successful Attachment', 'Test.txt', Blob.valueOf(content), n.Id, 'InternalUsers', 'I');
+        a.addNote('Successful Note', content, n.Id, 'AllUsers', 'I');
+        a.addAttachment('Successful Attachment', 'Test.txt', Blob.valueOf(content), n.Id, 'AllUsers', 'I');
         
         System.assertEquals(false, a.insertRecords());
         System.assertEquals(a.results.size(), 4);
