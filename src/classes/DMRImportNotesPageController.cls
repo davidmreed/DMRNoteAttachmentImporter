@@ -3,7 +3,7 @@ public class DMRImportNotesPageController {
     private ApexPages.StandardSetController controller {get; set;}
     public Integer noteCount { 
         get {
-            return controller.getRecords().size();
+            return controller.getSelected().size();
         }
     }
     
@@ -18,7 +18,7 @@ public class DMRImportNotesPageController {
     } 
     
     public PageReference importNotes() {
-        DMRNoteBulkImporter i = new DMRNoteBulkImporter(new List<Id>(new Map<Id, sObject>(controller.getRecords()).keySet()));
+        DMRNoteBulkImporter i = new DMRNoteBulkImporter(new List<Id>(new Map<Id, sObject>(controller.getSelected()).keySet()));
         
         if (batchSize < 1 || batchSize > 200)
             batchSize = 200;
