@@ -43,10 +43,16 @@ public class DMRNoteAttachmentImporter {
         //  - https://developer.salesforce.com/docs/atlas.en-us.apexcode.meta/apexcode/apex_methods_system_string.htm?search_text=escapexml
 
         ContentNote cn = new ContentNote();
-
-        cn.Title = title;
+        
+        if (title != null && title.normalizeSpace().size() > 0) {
+            // A null, zero-length, or all-whitespace title will result in an UnexpectedException on insert.
+            cn.Title = title;
+        } else {
+            cn.Title = 'Untitled Note';
+        }
+        
         cn.Content = Blob.valueOf(content.escapeXML().replace('\r\n', '<br>').replace('\r', '<br>').replace('\n', '<br>').replace('&apos;', '&#39;'));
-
+    
         objs.add(cn);
 
         ContentDocumentLink cdl = new ContentDocumentLink();
