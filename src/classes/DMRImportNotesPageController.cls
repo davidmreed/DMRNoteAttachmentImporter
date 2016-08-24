@@ -8,7 +8,10 @@ public class DMRImportNotesPageController {
     }
     
     public DMRImportNotesPageController() {
-        controller = new ApexPages.StandardSetController([SELECT Id FROM DMRNoteProxy__c WHERE Imported__c = false]);
+        List<sObject> notes = [SELECT Id FROM DMRNoteProxy__c WHERE Imported__c = false];
+        
+        controller = new ApexPages.StandardSetController(notes);
+        controller.setSelected(notes);
         batchSize = 200;
     }
     

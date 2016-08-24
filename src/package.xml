@@ -2,6 +2,7 @@
 <Package xmlns="http://soap.sforce.com/2006/04/metadata">
     <types>
         <members>DMRImportNotesPageController</members>
+        <members>DMRImportNotesPageControllerTEST</members>
         <members>DMRNoteAttachmentImporter</members>
         <members>DMRNoteAttachmentImporterTEST</members>
         <members>DMRNoteBulkImporter</members>
