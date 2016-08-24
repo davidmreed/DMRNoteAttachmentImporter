@@ -51,7 +51,6 @@ public class DMRNoteAttachmentImporter {
 
         ContentDocumentLink cdl = new ContentDocumentLink();
 
-        cdl.ContentDocumentId = cn.Id;
         cdl.LinkedEntityId = linkedTo;
         cdl.Visibility = visibility;
         cdl.ShareType = shareType;
