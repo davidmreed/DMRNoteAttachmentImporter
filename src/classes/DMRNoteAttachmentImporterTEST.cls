@@ -13,6 +13,9 @@ private class DMRNoteAttachmentImporterTEST {
         DMRNoteAttachmentImporter im = new DMRNoteAttachmentImporter();
 
         insert linkedContact;
+        
+        // Add 50 attachments linked to the same contact in a batch, plus one inserted in a one-off.
+        // Verify that there are 51 attachments linked.
 
         for (Integer i = 0; i < 50; i++) {
             im.addAttachment('Test Attachment', 'Test.txt', Blob.valueOf(content), linkedContact.Id, 'AllUsers', 'I');
@@ -29,6 +32,9 @@ private class DMRNoteAttachmentImporterTEST {
         DMRNoteAttachmentImporter im = new DMRNoteAttachmentImporter();
 
         insert linkedContact;
+        
+        // Add 50 notes linked to the same contact in a batch, plus one inserted in a one-off.
+        // Verify that there are 51 notes linked.
 
         for (Integer i = 0; i < 50; i++) {
             im.addNote('Test Note', content, linkedContact.Id, 'AllUsers', 'I');
@@ -38,7 +44,7 @@ private class DMRNoteAttachmentImporterTEST {
         
         System.assertEquals(true, DMRNoteAttachmentImporter.addSingleNote('Test Note', content, linkedContact.Id, 'AllUsers', 'I'));
 
-        // We are going to check that all notes/attachments inserted correctly.
+        // We are going to check that all notes inserted correctly.
         // We are not going to verify that the note text is exactly equal to
         // our original text (HTML conversion obviates that).
         System.assertEquals(51, [SELECT count() FROM ContentDocumentLink WHERE LinkedEntityId = :linkedContact.Id]);
@@ -50,6 +56,9 @@ private class DMRNoteAttachmentImporterTEST {
         Contact linkedContact = new Contact(LastName='Testify');
         
         insert linkedContact;
+        
+        // Insert 200 note proxy records. Run a batch import process.
+        // Confirm that 200 notes were created and all proxies were updated to mark them as imported.
 
         for (Integer i = 0; i < 200; i++) {
             proxies.add(new DMRNoteProxy__c(Title__c = 'Test', Content__c = content, LinkedTo__c = linkedContact.Id, Visibility__c = 'AllUsers', ShareType__c = 'I', Imported__c = False));
@@ -68,8 +77,10 @@ private class DMRNoteAttachmentImporterTEST {
     
     @istest
     private static void testErrorHandling() {
-        // To test error handling, we will attempt to import notes and attachments that fail both for themselves and in their ContentDocumentLinks.
+        // To test error handling, we will attempt to import notes and attachments that succeed and fail.
         // We should get a result of false, errors listed in DMRNoteBulkImporter.results, and only the valid notes/attachments remaining.
+        // Note that all of the errors we are triggering are due to the ContentDocumentLink.
+        // Most errors relating to the note itself are uncatchable System.UnexpectedExceptions.
         DMRNoteProxy__c n = new DMRNoteProxy__c();
         DMRNoteAttachmentImporter a = new DMRNoteAttachmentImporter();
         

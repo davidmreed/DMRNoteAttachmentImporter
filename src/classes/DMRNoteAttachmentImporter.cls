@@ -33,7 +33,7 @@ public class DMRNoteAttachmentImporter {
         // 1. Replace all basic HTML characters (<>"'&) with their corresponding entities (&amp; etc.)
         // 2. Replace all line breaks with <br>
         // 3. Replace &apos; with &#39; per Salesforce documentation.
-        // Note that all other Unicode characters should *not* be replaced with entities.
+        // Note that all other Unicode characters should *not* be replaced with entities. Malformed Unicode or nonprinting characters cause exceptions.
         // Other entities, including &apos;, result in an exception. Unicode is supported just fine, however.
         // This is why we do not use String.escapeHTML4(), which does replace Unicode. String.escapeXML() is closest to what we need.
         // Documentation is incorrect about this in various locations.
@@ -91,6 +91,7 @@ public class DMRNoteAttachmentImporter {
         results = Database.insert(objs, false);
        
         for (Integer i = 0; i < results.size(); i++) {
+            // Iterate over the insert results. Build a ContentDocumentLink for each successful insertion.
             Database.SaveResult sr = results[i]; 
             
             if (sr.isSuccess()) {
@@ -117,6 +118,9 @@ public class DMRNoteAttachmentImporter {
         Set<Id> contentDocumentIds = new Set<Id>();
                 
         if (attachmentIds.size() > 0) {
+            // Query to update the ContentDocumentIds for our ContentVersions, then iterate over the attachments' ContentDocumentLinks
+            // and insert the document IDs.
+            // Save the ContentDocument IDs so we can distinguish later between links to ContentDocuments and ContentNotes. 
             Map<Id, ContentVersion> m = new Map<Id, ContentVersion>([SELECT ContentDocumentId FROM ContentVersion WHERE Id IN :attachmentIds]);
         
             for (Integer i = 0; i < linksToAttachments.size(); i++) {
@@ -128,7 +132,7 @@ public class DMRNoteAttachmentImporter {
         List<Database.SaveResult> linksSRs = Database.insert(linksToInsert, false);
         
         // If any link object failed to insert, remove the corresponding note or attachment and report the error.
-        // ContentVersion cannot be deleted directly; query for the associated ContentDocument and remove that.
+        // ContentVersion cannot be deleted directly; use the saved ID for the associated ContentDocument and remove that.
         List<Id> attachmentsToDelete = new List<Id>();
         List<Id> notesToDelete = new List<Id>();
         
@@ -149,6 +153,7 @@ public class DMRNoteAttachmentImporter {
         
         if (attachmentsToDelete.size() > 0) {
             List<ContentDocument> documents = [SELECT Id FROM ContentDocument WHERE Id IN :attachmentsToDelete];
+            
             delete documents;
             retval = false;
         }

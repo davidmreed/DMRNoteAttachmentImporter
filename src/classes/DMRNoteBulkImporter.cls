@@ -20,6 +20,7 @@ public class DMRNoteBulkImporter implements Database.Batchable<sObject> {
     public void execute(Database.BatchableContext bc, List<sObject> noteProxies) {
         DMRNoteAttachmentImporter im = new DMRNoteAttachmentImporter();
 
+        // Add a note record for each DMRNoteProxy object.
         for (sObject np : noteProxies) {
             DMRNoteProxy__c proxy = (DMRNoteProxy__c)np;
             
@@ -28,6 +29,9 @@ public class DMRNoteBulkImporter implements Database.Batchable<sObject> {
 
         im.insertRecords();
         
+        // Update the original proxy objects to reflect a successful import or an error.
+        // Note that most errors that will be thrown during the import process are System.UnexpectedExceptions,
+        // which can't be caught and will abort the entire batch.
         for (Integer i = 0; i < im.results.size(); i++) {
             DMRNoteProxy__c proxy = (DMRNoteProxy__c)noteProxies[i];
 
