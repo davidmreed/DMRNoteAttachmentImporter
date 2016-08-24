@@ -144,6 +144,43 @@
         <filterScope>Everything</filterScope>
         <label>All</label>
     </listViews>
+    <listViews>
+        <fullName>Notes_to_Import</fullName>
+        <columns>NAME</columns>
+        <columns>LinkedTo__c</columns>
+        <columns>Title__c</columns>
+        <columns>Content__c</columns>
+        <filterScope>Everything</filterScope>
+        <filters>
+            <field>Imported__c</field>
+            <operation>equals</operation>
+            <value>0</value>
+        </filters>
+        <filters>
+            <field>Error__c</field>
+            <operation>equals</operation>
+        </filters>
+        <label>Notes to Import</label>
+    </listViews>
+    <listViews>
+        <fullName>Notes_with_Errors</fullName>
+        <columns>NAME</columns>
+        <columns>LinkedTo__c</columns>
+        <columns>Title__c</columns>
+        <columns>Content__c</columns>
+        <columns>Error__c</columns>
+        <filterScope>Everything</filterScope>
+        <filters>
+            <field>Error__c</field>
+            <operation>notEqual</operation>
+        </filters>
+        <filters>
+            <field>Imported__c</field>
+            <operation>equals</operation>
+            <value>0</value>
+        </filters>
+        <label>Notes with Errors</label>
+    </listViews>
     <nameField>
         <displayFormat>NP-{000000}</displayFormat>
         <label>Name</label>
