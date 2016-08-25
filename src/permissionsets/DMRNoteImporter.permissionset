@@ -5,15 +5,15 @@
         <enabled>true</enabled>
     </classAccesses>
     <classAccesses>
+        <apexClass>DMRImportNotesPageControllerTEST</apexClass>
+        <enabled>true</enabled>
+    </classAccesses>
+    <classAccesses>
         <apexClass>DMRNoteAttachmentImporter</apexClass>
         <enabled>true</enabled>
     </classAccesses>
     <classAccesses>
         <apexClass>DMRNoteAttachmentImporterTEST</apexClass>
-        <enabled>true</enabled>
-    </classAccesses>
-    <classAccesses>
-        <apexClass>DMRImportNotesPageControllerTEST</apexClass>
         <enabled>true</enabled>
     </classAccesses>
     <classAccesses>
