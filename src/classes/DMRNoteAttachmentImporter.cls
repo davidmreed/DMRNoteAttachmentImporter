@@ -44,7 +44,13 @@ public class DMRNoteAttachmentImporter {
 
         ContentNote cn = new ContentNote();
 
-        cn.Title = title;
+        if (title != null && title.normalizeSpace().length() > 0) {
+            // A null, zero-length, or all-whitespace title will result in an UnexpectedException on insert.
+            cn.Title = title;
+        } else {
+            cn.Title = 'Untitled Note';
+        }
+
         cn.Content = Blob.valueOf(content.escapeXML().replace('\r\n', '<br>').replace('\r', '<br>').replace('\n', '<br>').replace('&apos;', '&#39;'));
 
         objs.add(cn);
@@ -86,6 +92,7 @@ public class DMRNoteAttachmentImporter {
         List<ContentDocumentLink> linksToInsert = new List<ContentDocumentLink>();
         List<ContentDocumentLink> linksToAttachments = new List<ContentDocumentLink>();
         List<Id> attachmentIds = new List<Id>();
+        Map<Integer, Integer> indexMap = new Map<Integer, Integer>();
         Boolean retval = true;
         
         results = Database.insert(objs, false);
@@ -112,6 +119,11 @@ public class DMRNoteAttachmentImporter {
             } else {
                 retval = false;
             }
+            
+            // Since our results array for notes/attachments and for links will be different sizes,
+            // we construct a map relating the indices so that errors in creating links can be
+            // connected back to the original objects.
+            indexMap.put(linksToInsert.size() - 1, i);
         }
         
         // For the attachments, if any, pull out the ContentDocumentIds to update our links.
@@ -147,7 +159,7 @@ public class DMRNoteAttachmentImporter {
                 }
                 
                 // Replace the successful result from the associated note or attachment with this error record.
-                results.set(i, linksSRs[i]);
+                results.set(indexMap.get(i), linksSRs[i]);
             }
         }
         

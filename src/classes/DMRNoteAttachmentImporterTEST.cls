@@ -42,7 +42,8 @@ private class DMRNoteAttachmentImporterTEST {
 
         System.assertEquals(true, im.insertRecords());
         
-        System.assertEquals(true, DMRNoteAttachmentImporter.addSingleNote('Test Note', content, linkedContact.Id, 'AllUsers', 'I'));
+        // The empty title will be replaced to avoid triggering an exception.
+        System.assertEquals(true, DMRNoteAttachmentImporter.addSingleNote('', content, linkedContact.Id, 'AllUsers', 'I'));
 
         // We are going to check that all notes inserted correctly.
         // We are not going to verify that the note text is exactly equal to
@@ -60,9 +61,12 @@ private class DMRNoteAttachmentImporterTEST {
         // Insert 200 note proxy records. Run a batch import process.
         // Confirm that 200 notes were created and all proxies were updated to mark them as imported.
 
-        for (Integer i = 0; i < 200; i++) {
+        for (Integer i = 0; i < 199; i++) {
             proxies.add(new DMRNoteProxy__c(Title__c = 'Test', Content__c = content, LinkedTo__c = linkedContact.Id, Visibility__c = 'AllUsers', ShareType__c = 'I', Imported__c = False));
         }
+        
+        // Add one note record that will fail.
+        proxies.add(new DMRNoteProxy__c(Title__c = 'Test', Content__c = content, LinkedTo__c = linkedContact.Id, Visibility__c = 'AllUsers', ShareType__c = 'Q', Imported__c = False));
 
         insert proxies;
 
@@ -71,8 +75,9 @@ private class DMRNoteAttachmentImporterTEST {
         Test.startTest();
         Database.executeBatch(b);
         Test.stopTest();
-        System.assertEquals(200, [SELECT count() FROM ContentDocumentLink WHERE LinkedEntityId = :linkedContact.Id]);
-        System.assertEquals(0, [SELECT count() FROM DMRNoteProxy__c WHERE Imported__c = false]);        
+        System.assertEquals(199, [SELECT count() FROM ContentDocumentLink WHERE LinkedEntityId = :linkedContact.Id]);
+        System.assertEquals(1, [SELECT count() FROM DMRNoteProxy__c WHERE Imported__c = false]);
+        System.assertEquals(1, [SELECT count() FROM DMRNoteProxy__c WHERE Error__c <> '']);       
     }
     
     @istest
@@ -81,29 +86,51 @@ private class DMRNoteAttachmentImporterTEST {
         // We should get a result of false, errors listed in DMRNoteBulkImporter.results, and only the valid notes/attachments remaining.
         // Note that all of the errors we are triggering are due to the ContentDocumentLink.
         // Most errors relating to the note itself are uncatchable System.UnexpectedExceptions.
-        DMRNoteProxy__c n = new DMRNoteProxy__c();
+        Contact n = new Contact(LastName='N');
+        Contact m = new Contact(LastName='M');
         DMRNoteAttachmentImporter a = new DMRNoteAttachmentImporter();
         
         insert n;
+        insert m;
+      
+        // Succeed
+        a.addNote('Successful Note 1', content, n.Id, 'AllUsers', 'I');
+        a.addAttachment('Successful Attachment 1', 'Test.txt', Blob.valueOf(content), n.Id, 'AllUsers', 'I');
+      
+        // Fail due to a too-long Title field (note: this is the only route I'm aware of to produce a DMLException, rather than an UnexpectedException)
+        // Our Content string is 307 characters; the limit is 255.
+        a.addNote(content, content, n.Id, 'AllUsers', 'I');
         
         // Fail due to invalid ContentDocumentLinks
         a.addAttachment('Test Attachment', 'Test.txt', Blob.valueOf(content), n.Id, 'AllUsers', 'Q');
-        a.addNote('Test Note', content, n.Id, 'AllUsers', 'Q');
+        a.addNote('Test Note', content, m.Id, 'AllUsers', 'Q');
               
         // Succeed
-        a.addNote('Successful Note', content, n.Id, 'AllUsers', 'I');
-        a.addAttachment('Successful Attachment', 'Test.txt', Blob.valueOf(content), n.Id, 'AllUsers', 'I');
+        a.addNote('Successful Note 2', content, m.Id, 'AllUsers', 'I');
+        a.addAttachment('Successful Attachment 2', 'Test.txt', Blob.valueOf(content), m.Id, 'AllUsers', 'I');
         
         System.assertEquals(false, a.insertRecords());
-        System.assertEquals(a.results.size(), 4);
-        System.assertEquals(false, a.results[0].isSuccess());        
-        System.assertEquals(false, a.results[1].isSuccess());
-        System.assertEquals(true, a.results[2].isSuccess());
-        System.assertEquals(true, a.results[3].isSuccess());
+        System.assertEquals(a.results.size(), 7);
+        System.assertEquals(true, a.results[0].isSuccess());        
+        System.assertEquals(true, a.results[1].isSuccess());
+        System.assertEquals(false, a.results[2].isSuccess());
+        System.assertEquals(false, a.results[3].isSuccess());
+        System.assertEquals(false, a.results[4].isSuccess());
+        System.assertEquals(true, a.results[5].isSuccess());
+        System.assertEquals(true, a.results[6].isSuccess());
+        
+        // Confirm the right number of notes/attachments is associated with each Contact, and that bad records were deleted.
         System.assertEquals(2, [SELECT count() FROM ContentDocumentLink WHERE LinkedEntityId = :n.Id]);        
-        System.assertEquals(1, [SELECT count() FROM ContentNote]);
-        // ContentNotes have hidden ContentVersions/ContentDocuments somewhere or other.
-        System.assertEquals(2, [SELECT count() FROM ContentVersion]);
-        System.assertEquals(2, [SELECT count() FROM ContentDocument]);
+        System.assertEquals(2, [SELECT count() FROM ContentDocumentLink WHERE LinkedEntityId = :m.Id]);        
+        System.assertEquals(2, [SELECT count() FROM ContentNote]);
+        // ContentNotes have ContentVersions/ContentDocuments behind the scenes.
+        System.assertEquals(4, [SELECT count() FROM ContentVersion]);
+        System.assertEquals(4, [SELECT count() FROM ContentDocument]);
+        
+        // Make sure Note and Attachment 1 went to n, and 2 went to m.
+        System.assertEquals(1, [SELECT count() FROM ContentDocumentLink WHERE ContentDocument.Title = 'Successful Note 1' AND LinkedEntityId = :n.Id]);
+        System.assertEquals(1, [SELECT count() FROM ContentDocumentLink WHERE ContentDocument.Title = 'Successful Attachment 1' AND LinkedEntityId = :n.Id]);
+        System.assertEquals(1, [SELECT count() FROM ContentDocumentLink WHERE ContentDocument.Title = 'Successful Note 2' AND LinkedEntityId = :m.Id]);
+        System.assertEquals(1, [SELECT count() FROM ContentDocumentLink WHERE ContentDocument.Title = 'Successful Attachment 2' AND LinkedEntityId = :m.Id]);
     }
 }
