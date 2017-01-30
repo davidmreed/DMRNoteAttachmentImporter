@@ -5,12 +5,12 @@ public class DMRImportNotesPageController {
     private ApexPages.StandardSetController controller {get; set;}
     public Boolean hasSelection {
     	get {
-    		return controller.getSelected().size() != 0;
+    		return countForSelected != 0;
     	}
     }
     public Boolean hasRecords {
     	get {
-    		return controller.getRecords().size() != 0;
+    		return countForSet != 0;
     	}
     }
     public Integer countForAll {
@@ -28,7 +28,6 @@ public class DMRImportNotesPageController {
       		return notesForImportType('set').size();
         }
     }
-
         
     public DMRImportNotesPageController(ApexPages.StandardSetController standardController) { 
     	// This initializer may be invoked whether we're in a tab or called from a list view.
