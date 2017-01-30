@@ -20,14 +20,27 @@ private class DMRImportNotesPageControllerTEST {
         
         insert proxies;
         
-        // Use both constructors
-        DMRImportNotesPageController c = new DMRImportNotesPageController(new ApexPages.StandardSetController(proxies));
+        ApexPages.StandardSetController ctl = new ApexPages.StandardSetController(proxies);
+        DMRImportNotesPageController c = new DMRImportNotesPageController(ctl);
+        System.assertEquals('set', c.importType);
+        System.assertEquals(false, c.hasSelection);
+        System.assertEquals(true, c.hasRecords);
+
+        c = new DMRImportNotesPageController(new ApexPages.StandardSetController(null));
+        System.assertEquals('all', c.importType);
+        System.assertEquals(false, c.hasSelection);
+        System.assertEquals(false, c.hasRecords);
+        
+        ctl.setSelected(new Set<DMRNoteProxy__c>(proxies[0]));
+        c = new DMRImportNotesPageController(ctl);
+        System.assertEquals('selected', c.importType);
+        System.assertEquals(true, c.hasSelection);
+        System.assertEquals(true, c.hasRecords);
+        
+        System.assertEquals(1, c.countForSelected);
+        System.assertEquals(200, c.countForSet);
+        System.assertEquals(200, c.countForAll);
                 
-        c = new DMRImportNotesPageController();
-        
-        // Without a set controller, it will pull all un-imported note proxies.
-        System.assertEquals(200, c.noteCount);
-        
         // It'll adjust itself back down.
         c.batchSize = 5000;
         
