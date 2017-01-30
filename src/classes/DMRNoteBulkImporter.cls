@@ -34,6 +34,7 @@ public class DMRNoteBulkImporter implements Database.Batchable<sObject> {
         // Update the original proxy objects to reflect a successful import or an error.
         // Note that most errors that will be thrown during the import process are System.UnexpectedExceptions,
         // which can't be caught and will abort the entire batch.
+        // We'll detect and mark this circumstance in our finish()
         for (Integer i = 0; i < im.results.size(); i++) {
             DMRNoteProxy__c proxy = (DMRNoteProxy__c)noteProxies[i];
 

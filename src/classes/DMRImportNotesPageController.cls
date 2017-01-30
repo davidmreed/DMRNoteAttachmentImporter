@@ -5,39 +5,67 @@ public class DMRImportNotesPageController {
     private ApexPages.StandardSetController controller {get; set;}
     public Boolean hasSelection {
     	get {
-    		return controller != null;
+    		return controller.getSelected().size() != 0;
     	}
     }
-    
-    public DMRImportNotesPageController() {
-    	// We're the controller for a this component as used in a standalone tab
-    	// (i.e., not invoked from a list view)
-        List<sObject> notes = [SELECT Id FROM DMRNoteProxy__c WHERE Imported__c = false];
-        
-        controller = null;
-        importType = 'all';
-        removeImported = true;
-        batchSize = 200;
+    public Boolean hasRecords {
+    	get {
+    		return controller.getRecords().size() != 0;
+    	}
     }
-    
+    public Integer countForAll {
+        get {
+      		return notesForImportType('all').size();
+        }
+    }
+    public Integer countForSelected {
+        get {
+      		return notesForImportType('selected').size();
+        }
+    }
+    public Integer countForSet {
+        get {
+      		return notesForImportType('set').size();
+        }
+    }
+
+        
     public DMRImportNotesPageController(ApexPages.StandardSetController standardController) { 
-    	// We're being invoked from a list view, so there's a user-selected note set.
+    	// This initializer may be invoked whether we're in a tab or called from a list view.
+    	// Attempt to intelligently determine the type of import based on the user's selection
+    	// and the contents of our controller.
+    	
         controller = standardController; 
-        importType = 'selected';
         removeImported = true;
         batchSize = 200;
+        
+        if (!hasRecords) {
+            importType = 'all';
+        } else {
+            if (hasSelection) {
+                importType = 'selected';
+            } else {
+                importType = 'set';
+            }
+        }
     } 
+    
+    public List<DMRNoteProxy__c> notesForImportType(String aType) {
+        if (aType == 'selected') {
+        	return controller.getSelected();
+        } else if (aType == 'set') {
+            return controller.getRecords();
+        } else {
+        	return [SELECT Id FROM DMRNoteProxy__c WHERE Imported__c = false];
+        }
+    }
     
     public PageReference importNotes() {
         DMRNoteBulkImporter i;
         List<DMRNoteProxy__c> notes;
         
         // Pull out the appropriate note set
-        if (controller != null && importType == 'selected') {
-        	notes = controller.getSelected();
-        } else {
-        	notes = [SELECT Id FROM DMRNoteProxy__c WHERE Imported__c = false];
-        }
+        notes = notesForImportType(importType);
 
         i = new DMRNoteBulkImporter(new List<Id>(new Map<Id, sObject>(notes).keySet()));
         i.removeImported = removeImported;

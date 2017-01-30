@@ -1,26 +1,29 @@
 <apex:page standardController="DMRNoteProxy__c" extensions="DMRImportNotesPageController" recordSetVar="proxies">
 <apex:form >
 <apex:pageBlock title="Import Notes">
+    <apex:pageBlockButtons >    
+        <apex:commandButton value="Import" action="{!importNotes}" />
+        <apex:commandButton value="Cancel" action="{!cancel}" />
+	</apex:pageBlockButtons>
     <apex:pageBlockSection >
-    	<apex:pageBlockSectionItem >
-    		<apex:outputLabel value="Import Type" for="it" />
-    		<apex:selectRadio id="id" value="{!importType}">
-    			<apex:selectOption itemValue="all" itemLabel="All Unimported Note Proxies" />
-    			<apex:selectOption itemValue="selected" itemLabel="Selected Note Proxies" rendered="{! hasSelection }" />
-    		</apex:selectRadio>
-   		</apex:pageBlockSectionItem>	
         <apex:pageBlockSectionItem >
-            <apex:outputLabel value="Block Size" for="bs" />
+            <apex:outputLabel value="Import Type" for="it" />
+            <apex:selectRadio layout="pageDirection" id="id" value="{!importType}">
+                <apex:selectOption itemValue="all" itemLabel="All Unimported Note Proxies ({! countForAll })" />
+                <apex:selectOption itemValue="selected" itemLabel="Selected Note Proxies ({! countForSelected })" itemDisabled="{! NOT(hasSelection) }" />
+                <apex:selectOption itemValue="set" itemLabel="Listed Note Proxies ({! countForSet })" itemDisabled="{! NOT(hasRecords) }" />
+            </apex:selectRadio>
+        </apex:pageBlockSectionItem>
+        <apex:pageBlockSectionItem >
+            <apex:outputLabel value="Batch Size" for="bs" />
             <apex:inputText id="bs" value="{!batchSize}" required="true" size="4" />
         </apex:pageBlockSectionItem>
         <apex:pageBlockSectionItem >
-   			<apex:inputCheckbox value="{! removeImported }" label="Remove Imported Note Proxies" /> 
-   		</apex:pageBlockSectionItem>
-   		<apex:pageBlockSectionItem >
- 		    <p>For large notes (above 32KB), a reduction in batch size is recommended.</p>
- 		</apex:pageBlockSectionItem>
+            <apex:outputLabel for="ri" value="Remove Imported Note Proxies" /> 
+            <apex:inputCheckbox value="{! removeImported }" id="ri" />
+        </apex:pageBlockSectionItem>
     </apex:pageBlockSection>
-    <apex:commandButton value="Import" action="{!importNotes}" />
+    <p>For large notes (above 32KB), a reduction in batch size is recommended.</p>
     </apex:pageBlock>
 </apex:form>
 </apex:page>
