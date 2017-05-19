@@ -26,9 +26,9 @@ Note that the [API reference on `ContentNote`](https://developer.salesforce.com/
 
 Both the Apex methods below and the Note Proxy object used for bulk note imports accept parameters for visibility and sharing settings. When linking notes and attachments to regular Salesforce records, like Contacts, visibility "AllUsers" and sharing type "I" (inferred) are appropriate. (Other visibility values will actually cause exceptions). More detail on acceptable values is found in the [`ContentDocumentLink` API reference](https://developer.salesforce.com/docs/atlas.en-us.api.meta/api/sforce_api_objects_contentdocumentlink.htm). Values other than "AllUsers"/"I" may be useful when working with content libraries or communities.
 
-## Note-Related Limits
+## Note- and Attachment-Related Limits
 
-There are Salesforce governor limits on the number of `ContentVersion` (which includes notes and attachments) that can be inserted in a 24 hour period. For production editions of Salesforce, the limit is 36,000. However, for developer editions, the limit is only 2,500. It's very easy to hit this limit in testing within a developer organization. Note that hitting this limit also results in a `System.UnexpectedException`.
+There are Salesforce governor limits on the number of `ContentVersion` objects (which includes notes and attachments) that can be inserted in a 24 hour period. For production editions of Salesforce, the limit is 36,000. However, for developer editions, the limit is only 2,500. It's very easy to hit this limit in testing within a developer organization. (The included test suite inserts a large number of `ContentVersion` objects). Note that hitting this limit also results in a `System.UnexpectedException`.
 
 ## Notes and Attachments in Apex
 
