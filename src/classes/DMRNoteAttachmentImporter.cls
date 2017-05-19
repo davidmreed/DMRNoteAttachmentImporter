@@ -1,11 +1,11 @@
 // DMRNoteAttachmentImporter.cls
-// (c) 2016 David Reed
+// (c) 2016-2017 David Reed
 // Available under the terms of the MIT License.
 
 public class DMRNoteAttachmentImporter {
     private List<sObject> objs;
     private List<ContentDocumentLink> links;
-    public List<Database.SaveResult> results {get; private set;}
+    public List<Database.SaveResult> results { get; private set; }
 
     public DMRNoteAttachmentImporter() {
         objs = new List<sObject>();
@@ -46,6 +46,7 @@ public class DMRNoteAttachmentImporter {
 
         if (title != null && title.normalizeSpace().length() > 0) {
             // A null, zero-length, or all-whitespace title will result in an UnexpectedException on insert.
+            // We provide a private override flag for testing.
             cn.Title = title;
         } else {
             cn.Title = 'Untitled Note';

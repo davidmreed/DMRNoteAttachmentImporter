@@ -1,3 +1,8 @@
+<!--
+DMRImportNotes.vfp
+(c) 2016-2017 David Reed
+Available under the terms of the MIT License.
+-->
 <apex:page standardController="DMRNoteProxy__c" extensions="DMRImportNotesPageController" recordSetVar="proxies">
 <apex:form >
 <apex:pageBlock title="Import Notes">
@@ -11,7 +16,7 @@
             <apex:selectRadio layout="pageDirection" id="id" value="{!importType}">
                 <apex:selectOption itemValue="all" itemLabel="All Unimported Note Proxies ({! countForAll })" />
                 <apex:selectOption itemValue="selected" itemLabel="Selected Note Proxies ({! countForSelected })" itemDisabled="{! NOT(hasSelection) }" />
-                <apex:selectOption itemValue="set" itemLabel="Listed Note Proxies ({! countForSet })" itemDisabled="{! NOT(hasRecords) }" />
+                <apex:selectOption itemValue="set" itemLabel="Note Proxies in List View ({! countForSet })" itemDisabled="{! NOT(hasRecords) }" />
             </apex:selectRadio>
         </apex:pageBlockSectionItem>
         <apex:pageBlockSectionItem >

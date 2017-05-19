@@ -1,10 +1,10 @@
 // DMRNoteBulkImporter.cls
-// (c) 2016 David Reed
+// (c) 2016-2017 David Reed
 // Available under the terms of the MIT License.
 
 public class DMRNoteBulkImporter implements Database.Batchable<sObject> {
     private List<Id> noteProxyIDs;
-    public Boolean removeImported {get; set;}
+    public Boolean removeImported { get; set; }
 
     public DMRNoteBulkImporter(List<Id> proxies) {
         noteProxyIDs = new List<Id>(proxies);
@@ -21,7 +21,7 @@ public class DMRNoteBulkImporter implements Database.Batchable<sObject> {
     // Limits usage: 0-2 SOQL queries (from DMRNoteAttachmentImporter.insertRecords()), 3-4 DML operations (2 inherited + 1)
     public void execute(Database.BatchableContext bc, List<sObject> noteProxies) {
         DMRNoteAttachmentImporter im = new DMRNoteAttachmentImporter();
-
+        
         // Add a note record for each DMRNoteProxy object.
         for (sObject np : noteProxies) {
             DMRNoteProxy__c proxy = (DMRNoteProxy__c)np;
@@ -33,8 +33,7 @@ public class DMRNoteBulkImporter implements Database.Batchable<sObject> {
         
         // Update the original proxy objects to reflect a successful import or an error.
         // Note that most errors that will be thrown during the import process are System.UnexpectedExceptions,
-        // which can't be caught and will abort the entire batch.
-        // We'll detect and mark this circumstance in our finish()
+        // which can't be caught and will abort the entire operation.
         for (Integer i = 0; i < im.results.size(); i++) {
             DMRNoteProxy__c proxy = (DMRNoteProxy__c)noteProxies[i];
 
@@ -58,18 +57,6 @@ public class DMRNoteBulkImporter implements Database.Batchable<sObject> {
     	
     	if (removeImported) {
     		delete [SELECT Id FROM DMRNoteProxy__c WHERE Imported__c = true AND Id in :noteProxyIDs];
-    	}
-    	
-    	// Identify notes where an UnexpectedException took place and flag appropriately.
-    	
-    	List<DMRNoteProxy__c> unimportedNotes = [SELECT Id FROM DMRNoteProxy__c WHERE Imported__c = false AND Error__c = ''];
-    	
-    	if (unimportedNotes.size() > 0) {
-    		for (DMRNoteProxy__c n : unimportedNotes) {
-    			n.Error__c = 'An unknown error caused a batch of notes to fail to import. One or more notes may contain invalid content';
-    		}
-    		
-   			update unimportedNotes; 		
-       	}
+    	}    	
     }
 }

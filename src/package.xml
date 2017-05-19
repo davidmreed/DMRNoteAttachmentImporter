@@ -6,11 +6,16 @@
         <members>DMRNoteAttachmentImporter</members>
         <members>DMRNoteAttachmentImporterTEST</members>
         <members>DMRNoteBulkImporter</members>
+        <members>DMRNoteBulkImporterTEST</members>
         <name>ApexClass</name>
     </types>
     <types>
         <members>DMRImportNotes</members>
         <name>ApexPage</name>
+    </types>
+    <types>
+        <members>DMRNoteAttachmentImporterSuite</members>
+        <name>ApexTestSuite</name>
     </types>
     <types>
         <members>DMRNoteProxy__c</members>
@@ -28,5 +33,5 @@
         <members>DMRNoteImporter</members>
         <name>PermissionSet</name>
     </types>
-    <version>36.0</version>
+    <version>39.0</version>
 </Package>

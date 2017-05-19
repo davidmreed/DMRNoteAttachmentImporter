@@ -1,8 +1,19 @@
+// DMRImportNotesPageController.cls
+// (c) 2016-2017 David Reed
+// Available under the terms of the MIT License.
+
 public class DMRImportNotesPageController {
-    public Integer batchSize {get; set;}
-    public String importType {get; set;}
-    public Boolean removeImported {get; set;}
-    private ApexPages.StandardSetController controller {get; set;}
+    public Integer batchSize { 	
+        get; 
+        set { 
+            batchSize = Math.min(Math.abs(value), 200); 
+            if (batchSize == 0) 
+                batchSize = 200; 
+        }
+    }
+    public String importType { get; set; }
+    public Boolean removeImported { get; set; }
+    private ApexPages.StandardSetController controller { get; set; }
     public Boolean hasSelection {
     	get {
     		return countForSelected != 0;
@@ -25,7 +36,7 @@ public class DMRImportNotesPageController {
     }
     public Integer countForSet {
         get {
-      		return notesForImportType('set').size();
+      		return controller.getResultSize();
         }
     }
         
@@ -53,6 +64,8 @@ public class DMRImportNotesPageController {
         if (aType == 'selected') {
         	return controller.getSelected();
         } else if (aType == 'set') {
+			controller.setPageSize(controller.getResultSize());
+            
             return controller.getRecords();
         } else {
         	return [SELECT Id FROM DMRNoteProxy__c WHERE Imported__c = false];
@@ -69,11 +82,7 @@ public class DMRImportNotesPageController {
         i = new DMRNoteBulkImporter(new List<Id>(new Map<Id, sObject>(notes).keySet()));
         i.removeImported = removeImported;
         
-        // Clamp the batch size reasonably. This operation can use a fair amount of memory.
-        // Testing shows batch reduction below 200 required for 32KB+ notes.
-        if (batchSize < 1 || batchSize > 200)
-            batchSize = 200;
-        
+        // Testing shows batch reduction below 200 required for 32KB+ notes.        
         Database.executeBatch(i, batchSize);
         
         PageReference pageReference = new PageReference('/' + DMRNoteProxy__c.SObjectType.getDescribe().getKeyPrefix() + '/o');
