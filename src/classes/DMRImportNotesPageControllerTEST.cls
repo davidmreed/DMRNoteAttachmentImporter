@@ -26,12 +26,12 @@ private class DMRImportNotesPageControllerTEST {
         System.assertEquals(false, c.hasSelection);
         System.assertEquals(true, c.hasRecords);
 
-        c = new DMRImportNotesPageController(new ApexPages.StandardSetController(null));
+        c = new DMRImportNotesPageController(new ApexPages.StandardSetController(new List<DMRNoteProxy__c>()));
         System.assertEquals('all', c.importType);
         System.assertEquals(false, c.hasSelection);
         System.assertEquals(false, c.hasRecords);
         
-        ctl.setSelected(new Set<DMRNoteProxy__c>(proxies[0]));
+        ctl.setSelected(new List<DMRNoteProxy__c>{proxies[0]});
         c = new DMRImportNotesPageController(ctl);
         System.assertEquals('selected', c.importType);
         System.assertEquals(true, c.hasSelection);

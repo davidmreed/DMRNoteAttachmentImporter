@@ -2,7 +2,7 @@
 <apex:form >
 <apex:pageBlock title="Import Notes">
     <apex:pageBlockButtons >    
-        <apex:commandButton value="Import" action="{!importNotes}" />
+        <apex:commandButton value="Import" action="{!importNotes}" disabled="{!AND(countForAll = 0, countForSelected = 0, countForSet = 0)}"/>
         <apex:commandButton value="Cancel" action="{!cancel}" />
 	</apex:pageBlockButtons>
     <apex:pageBlockSection >
