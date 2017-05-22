@@ -1,0 +1,16 @@
+machine:
+  python:
+    version: 2.7.12
+environment:
+  CUMULUSCI_KEYCHAIN_CLASS: cumulusci.core.keychain.EnvironmentProjectKeychain
+dependencies:
+  override:
+    - 'pip install --upgrade pip'
+    - 'pip install --upgrade -r requirements.txt'
+test:
+  override:
+    - 'cci task run run_tests'
+  post:
+    - 'mkdir -p $CIRCLE_TEST_REPORTS/junit/'
+    - 'cp test_results.xml $CIRCLE_TEST_REPORTS/junit/'
+
