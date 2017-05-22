@@ -3,6 +3,8 @@
 This source-only package provides Apex support for easily adding notes and attachments (using the new 
 content library objects) to Salesforce records, as well as bulk note importing. 100% test coverage is included.
 
+[![CircleCI](https://circleci.com/gh/davidmreed/DMRNoteAttachmentImporter.svg?style=svg)](https://circleci.com/gh/davidmreed/DMRNoteAttachmentImporter)
+
 The package is available under the MIT License.
 
 ## Note Content Preparation
