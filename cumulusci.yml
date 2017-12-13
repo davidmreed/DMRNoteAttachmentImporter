@@ -1,7 +1,0 @@
-project:
-    name: DMRNoteAttachmentImporter
-    package:
-        name: DMRNoteAttachmentImporter
-        namespace: 
-    test:
-        name_match: '%TEST%'

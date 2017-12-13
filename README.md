@@ -1,7 +1,7 @@
 # DMRNoteAttachmentImporter
 
-This source-only package provides Apex support for easily adding notes and attachments (using the new 
-content library objects) to Salesforce records, as well as bulk note importing. 100% test coverage is included.
+This unmanaged package provides Apex support for easily adding notes and attachments (using the new 
+content library objects) to Salesforce records, as well as bulk note importing. 100% test coverage is included. The package is distributed as Salesforce DX-format source code.
 
 [![CircleCI](https://circleci.com/gh/davidmreed/DMRNoteAttachmentImporter.svg?style=svg)](https://circleci.com/gh/davidmreed/DMRNoteAttachmentImporter)
 
@@ -26,11 +26,13 @@ Note that the [API reference on `ContentNote`](https://developer.salesforce.com/
 
 ## Sharing and Visibility Settings
 
-Both the Apex methods below and the Note Proxy object used for bulk note imports accept parameters for visibility and sharing settings. When linking notes and attachments to regular Salesforce records, like Contacts, visibility "AllUsers" and sharing type "I" (inferred) are appropriate. (Other visibility values will actually cause exceptions). More detail on acceptable values is found in the [`ContentDocumentLink` API reference](https://developer.salesforce.com/docs/atlas.en-us.api.meta/api/sforce_api_objects_contentdocumentlink.htm). Values other than "AllUsers"/"I" may be useful when working with content libraries or communities.
+Both the Apex methods below and the Note Proxy object used for bulk note imports accept parameters for visibility and sharing settings. When linking notes and attachments to regular Salesforce records, like Contacts, visibility `"AllUsers"` and sharing type `"I"` (inferred) are appropriate. (Other visibility values will actually cause exceptions). More detail on acceptable values is found in the [`ContentDocumentLink` API reference](https://developer.salesforce.com/docs/atlas.en-us.api.meta/api/sforce_api_objects_contentdocumentlink.htm). Values other than `"AllUsers"`/`"I"` may be useful when working with content libraries or communities.
 
 ## Note- and Attachment-Related Limits
 
-There are Salesforce governor limits on the number of `ContentVersion` objects (which includes notes and attachments) that can be inserted in a 24 hour period. For production editions of Salesforce, the limit is 36,000. However, for developer editions, the limit is only 2,500. It's very easy to hit this limit in testing within a developer organization. (The included test suite inserts a large number of `ContentVersion` objects). Note that hitting this limit also results in a `System.UnexpectedException`.
+There are Salesforce governor limits on the number of `ContentVersion` objects (which includes notes and attachments) that can be inserted in a 24 hour period. For production editions of Salesforce, the limit is 200,000. 
+
+For Developer Edition organizations, the `ContentVersion` limit is only 2,500. It's very easy to hit this limit in testing within a developer organization. Insofar as the included test suite inserts a large number of `ContentVersion` objects) and the fact that hitting this limit results in a `System.UnexpectedException`, it's recommended not to run the full test suite frequently, or to use scratch orgs to run tests.
 
 ## Notes and Attachments in Apex
 
@@ -38,7 +40,7 @@ The class `DMRNoteAttachmentImporter` provides Apex support. The following metho
 
 ### `void addNote(String title, String content, Id linkedTo, String visibility, String shareType)`
 
-Create a note linked to the record whose Id is supplied. `ContentNote` titles may not be null, empty, or composed only of whitespace; if such is provided, it will be replaced by the string "Untitled Note". `DMRNoteAttachmentImporter` will escape the text provided as required (see below). See the section above for more on `visibility` and `shareType`.
+Create a note linked to the record whose Id is supplied. `ContentNote` titles may not be null, empty, or composed only of whitespace; if such is provided, it will be replaced by the string "Untitled Note". `DMRNoteAttachmentImporter` will escape the text provided as required (see above). See the section above for more on the `visibility` and `shareType` parameters.
 
 ### `void addAttachment(String title, String path, Blob contents, Id linkedTo, String visibility, String shareType)`
 
@@ -57,7 +59,7 @@ These static convenience methods simply create the records as specified and imme
 
 Notes may be added in bulk by importing data to the `DMRNoteProxy__c` object using any data loader. If working with very large notes, bear in mind that some data loaders and spreadsheet applications are not able to handle more than 32KB of text within a CSV cell.
 
-List views on the Note Proxies tab provide access to proxies and can initiate a batch Apex process (`DMRNoteBulkImporter`) to perform imports. Be aware that, using the Note Proxy object, you can only import notes of lengths up to the limit of a Long Text Area, 131,072 characters (128KB, assuming 1-byte characters). In my testing, it's fine to process 32KB notes in batches of 200. Stepping up to 64KB notes required a reduction in batch size.
+List views on the Note Proxies tab provide access to proxies and can initiate a batch Apex process (`DMRNoteBulkImporter`) to perform imports. Be aware that, using the Note Proxy object, you can only import notes of lengths up to the limit of a Long Text Area, 131,072 characters (128KB, assuming 1-byte ASCII or Latin-1 characters). While your organization may vary, testing shows that it's possible to process 32KB notes in batches of 200. Stepping up to 64KB notes required a reduction in batch size.
 
 ## Permissions
 

@@ -1,0 +1,7 @@
+{
+    "orgName": "Demo Company",
+    "edition": "Enterprise",
+    "orgPreferences" : {
+        "enabled": ["ChatterEnabled", "NotesReservedPref01"]
+    }
+}

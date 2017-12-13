@@ -7,6 +7,6 @@ Referenced Packages
 *.sublime-workspace
 apex-scripts/log
 build.properties
-config
 mm.log
 ant-salesforce.jar
+.sfdx
