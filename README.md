@@ -4,6 +4,7 @@ This unmanaged package provides Apex support for easily adding notes and attachm
 content library objects) to Salesforce records, as well as bulk note importing. 100% test coverage is included. The package is distributed as Salesforce DX-format source code.
 
 [![CircleCI](https://circleci.com/gh/davidmreed/DMRNoteAttachmentImporter.svg?style=svg)](https://circleci.com/gh/davidmreed/DMRNoteAttachmentImporter)
+[![codecov](https://codecov.io/gh/davidmreed/DMRNoteAttachmentImporter/branch/master/graph/badge.svg)](https://codecov.io/gh/davidmreed/DMRNoteAttachmentImporter)
 
 The package is available under the MIT License.
 
