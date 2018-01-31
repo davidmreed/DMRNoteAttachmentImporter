@@ -28,6 +28,11 @@ jobs:
           command: |
               node_modules/sfdx-cli/bin/run force:auth:jwt:grant --clientid $CONSUMERKEY --jwtkeyfile assets/server.key --username $USERNAME --setdefaultdevhubusername -a DevHub
               node_modules/sfdx-cli/bin/run force:org:create -v DevHub -s -f config/project-scratch-def.json -a scratch
+      - run:
+          name: Remove Server Key
+          when: always
+          command: |
+              rm assets/server.key
       - run: 
           name: Push Source
           command: |
@@ -47,7 +52,6 @@ jobs:
           when: always
           command: |
               node_modules/sfdx-cli/bin/run force:org:delete -u scratch -p
-              rm assets/server.key
               rm ~/apex_tests/*.txt ~/apex_tests/test-result-7*.json
       - store_artifacts:
           path: ~/apex_tests
