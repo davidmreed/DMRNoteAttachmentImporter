@@ -10,7 +10,7 @@ The package is available under the MIT License.
 
 ## Note Content Preparation
 
-The following steps are required to [prepare note content](https://help.salesforce.com/apex/HTViewSolution?id=000230867&language=en_US) for insertion into Salesforce:
+The following steps are required to [prepare note content](https://help.salesforce.com/apex/HTViewSolution?id=000230867&language=en_US) for insertion into Salesforce. Note that it's here assumed that note content is unformatted plain text, *not* HTML.
 
  1. Replace all basic HTML characters (`<>"'&`) with their corresponding entities (`&amp;` and friends).
  2. Replace all line breaks with `<br>` (taking care with Windows CRLF/Linux LF/Mac CR)
